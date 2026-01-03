@@ -97,21 +97,21 @@ echo ""
 
 # Step 5: Create config file
 echo "[5/6] Creating configuration file..."
-cat > "$CONFIG_DIR/config.json" <<EOF
+cat > "$CONFIG_DIR/config.json" <<'EOF'
 {
-  "listen": ":$SERVER_PORT",
+  "listen": ":36712",
   "tls": {
-    "cert": "$CONFIG_DIR/server.crt",
-    "key": "$CONFIG_DIR/server.key"
+    "cert": "/etc/zivpn/server.crt",
+    "key": "/etc/zivpn/server.key"
   },
   "auth": {
     "type": "password",
-    "password": "$SERVER_PASSWORD"
+    "password": "PASSWORD_PLACEHOLDER"
   },
   "obfs": {
     "type": "salamander",
     "salamander": {
-      "password": "$OBFS_KEY"
+      "password": "OBFS_PLACEHOLDER"
     }
   },
   "quic": {
@@ -132,6 +132,11 @@ cat > "$CONFIG_DIR/config.json" <<EOF
   "disableUDP": false
 }
 EOF
+
+# Replace placeholders
+sed -i "s/PASSWORD_PLACEHOLDER/$SERVER_PASSWORD/g" "$CONFIG_DIR/config.json"
+sed -i "s/OBFS_PLACEHOLDER/$OBFS_KEY/g" "$CONFIG_DIR/config.json"
+sed -i "s/:36712/:$SERVER_PORT/g" "$CONFIG_DIR/config.json"
 chmod 600 "$CONFIG_DIR/config.json"
 echo -e "${GREEN}✓ Config saved: $CONFIG_DIR/config.json${NC}"
 echo ""
