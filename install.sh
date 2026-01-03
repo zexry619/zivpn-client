@@ -71,19 +71,60 @@ fi
 
 mkdir -p "$INSTALL_DIR"
 
-if [ "$USE_GIT" = true ]; then
-    git clone --depth 1 "$REPO_URL.git" "$INSTALL_DIR"
+# Download main files first
+echo "  Downloading scripts..."
+TMP_DIR="/tmp/zivpn-install-$$"
+mkdir -p "$TMP_DIR"
+
+# Download files from GitHub raw
+GITHUB_RAW="https://raw.githubusercontent.com/zexry619/zivpn-client/main"
+
+if command -v curl &> /dev/null; then
+    DOWNLOAD="curl -fsSL"
 else
-    # Download tarball
-    TMP_FILE="/tmp/zivpn-client.tar.gz"
-    if command -v curl &> /dev/null; then
-        curl -fsSL "$REPO_URL/archive/refs/heads/main.tar.gz" -o "$TMP_FILE"
-    else
-        wget -q "$REPO_URL/archive/refs/heads/main.tar.gz" -O "$TMP_FILE"
-    fi
-    tar xzf "$TMP_FILE" -C "$INSTALL_DIR" --strip-components=1
-    rm -f "$TMP_FILE"
+    DOWNLOAD="wget -qO-"
 fi
+
+# Download main script
+$DOWNLOAD "$GITHUB_RAW/zivpn.sh" > "$TMP_DIR/zivpn.sh"
+chmod +x "$TMP_DIR/zivpn.sh"
+
+# Download docs
+$DOWNLOAD "$GITHUB_RAW/README.md" > "$TMP_DIR/README.md"
+$DOWNLOAD "$GITHUB_RAW/SIMPLE-GUIDE.md" > "$TMP_DIR/SIMPLE-GUIDE.md" 2>/dev/null || true
+
+# Download binaries (from original build location)
+echo "  Downloading binaries ($BINARY_SUFFIX)..."
+mkdir -p "$TMP_DIR/client"
+
+# Try from GitHub first, if fails, download from alternative source
+if ! $DOWNLOAD "$GITHUB_RAW/client/hysteria-zivpn-$BINARY_SUFFIX" > "$TMP_DIR/client/hysteria-zivpn-$BINARY_SUFFIX" 2>/dev/null; then
+    echo "  ⚠ GitHub binary unavailable, downloading from build server..."
+    # Alternative: download from your build server or use curl from local
+    # For now, try direct git clone with LFS
+    if [ "$USE_GIT" = true ]; then
+        cd /tmp
+        git clone --depth 1 "$REPO_URL.git" "$TMP_DIR" 2>/dev/null || {
+            echo "❌ Error: Cannot download binaries"
+            echo "Please download manually from: $REPO_URL"
+            exit 1
+        }
+    else
+        echo "❌ Error: Binary download failed"
+        echo "Install git and try again, or download manually from:"
+        echo "  $REPO_URL"
+        exit 1
+    fi
+fi
+
+if ! $DOWNLOAD "$GITHUB_RAW/client/loadbalancer-$BINARY_SUFFIX" > "$TMP_DIR/client/loadbalancer-$BINARY_SUFFIX" 2>/dev/null; then
+    # Same fallback
+    true
+fi
+
+# Move to install dir
+mv "$TMP_DIR"/* "$INSTALL_DIR/" 2>/dev/null || cp -r "$TMP_DIR"/* "$INSTALL_DIR/"
+rm -rf "$TMP_DIR"
 
 cd "$INSTALL_DIR"
 
