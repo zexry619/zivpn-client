@@ -65,6 +65,7 @@ chmod +x zivpn.sh
 ## 📖 Documentation
 
 - [SIMPLE-GUIDE.md](SIMPLE-GUIDE.md) - Quick start guide (Bahasa Indonesia)
+- [CLIENT-USAGE.md](CLIENT-USAGE.md) - **How to use ZIVPN client** (Browser, proxychains, system-wide)
 - [SERVER-SETUP.md](SERVER-SETUP.md) - VPS server setup
 - [docs/README.md](docs/README.md) - Full documentation
 
