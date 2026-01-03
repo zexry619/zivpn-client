@@ -194,7 +194,11 @@ echo "   ✓ Installation Complete!"
 echo "======================================="
 echo ""
 echo -e "${GREEN}📋 Server Details:${NC}"
-echo "  Address: $(curl -s ifconfig.me):$SERVER_PORT"
+
+# Get public IP (prefer IPv4)
+PUBLIC_IP=$(curl -4 -s --max-time 5 ifconfig.me 2>/dev/null || curl -s --max-time 5 ifconfig.me 2>/dev/null || echo "YOUR_SERVER_IP")
+
+echo "  Address: $PUBLIC_IP:$SERVER_PORT"
 echo "  Password: $SERVER_PASSWORD"
 echo "  Obfuscation: $OBFS_KEY"
 echo ""
