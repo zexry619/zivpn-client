@@ -100,11 +100,12 @@ echo "[5/6] Creating configuration file..."
 cat > "$CONFIG_DIR/config.json" <<EOF
 {
   "listen": ":$SERVER_PORT",
-  "protocol": "udp",
-  "cert": "$CONFIG_DIR/server.crt",
-  "key": "$CONFIG_DIR/server.key",
+  "tls": {
+    "cert": "$CONFIG_DIR/server.crt",
+    "key": "$CONFIG_DIR/server.key"
+  },
   "auth": {
-    "mode": "password",
+    "type": "password",
     "password": "$SERVER_PASSWORD"
   },
   "obfs": {
@@ -118,8 +119,17 @@ cat > "$CONFIG_DIR/config.json" <<EOF
     "maxStreamReceiveWindow": 131072,
     "initConnReceiveWindow": 327680,
     "maxConnReceiveWindow": 327680,
-    "maxIdleTimeout": "30s"
-  }
+    "maxIdleTimeout": "30s",
+    "keepAlivePeriod": "10s",
+    "disablePathMTUDiscovery": false
+  },
+  "bandwidth": {
+    "up": "1 gbps",
+    "down": "1 gbps"
+  },
+  "ignoreClientBandwidth": false,
+  "speedTest": true,
+  "disableUDP": false
 }
 EOF
 chmod 600 "$CONFIG_DIR/config.json"
