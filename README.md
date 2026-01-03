@@ -23,16 +23,28 @@ curl -fsSL https://raw.githubusercontent.com/zexry619/zivpn-client/main/server-r
 curl -fsSL https://raw.githubusercontent.com/zexry619/zivpn-client/main/server-uninstall.sh | sudo bash
 ```
 
-Fully automated: certificates, firewall, systemd service, interactive config.
+---
+
+### 📱 Client (OpenWrt/Linux - Auto-detect amd64/arm64):
+
+**Install:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/zexry619/zivpn-client/main/client-install.sh | bash
+```
+
+**Reinstall:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/zexry619/zivpn-client/main/client-reinstall.sh | bash
+```
+
+**Uninstall:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/zexry619/zivpn-client/main/client-uninstall.sh | bash
+```
 
 ---
 
-### 📱 Client (OpenWrt/Linux):
-```bash
-curl -fsSL https://raw.githubusercontent.com/zexry619/zivpn-client/main/install.sh | bash
-```
-
-### Manual Install:
+### Manual Install (Advanced):
 ```bash
 # 1. Clone repository
 git clone https://github.com/zexry619/zivpn-client.git
