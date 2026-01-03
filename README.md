@@ -6,7 +6,15 @@ Multi-tunnel VPN client dengan 8 instance parallel + load balancer untuk kecepat
 
 ## 🚀 Quick Install (1 Command!)
 
-### OpenWrt / Linux:
+### 🖥️ Server (VPS/Linux):
+```bash
+curl -fsSL https://raw.githubusercontent.com/zexry619/zivpn-client/main/server-install.sh | sudo bash
+```
+Fully automated: certificates, firewall, systemd service, interactive config.
+
+---
+
+### 📱 Client (OpenWrt/Linux):
 ```bash
 curl -fsSL https://raw.githubusercontent.com/zexry619/zivpn-client/main/install.sh | bash
 ```
