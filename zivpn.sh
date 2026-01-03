@@ -144,9 +144,10 @@ start_zivpn() {
     "listen": "127.0.0.1:$PORT"
   },
   "bandwidth": {
-    "up": "50 mbps",
+    "up": "100 mbps",
     "down": "100 mbps"
-  }
+  },
+  "speed_test": false
 }
 EOFCONFIG
         
