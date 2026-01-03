@@ -74,19 +74,33 @@ start_zivpn() {
     HYSTERIA_BIN=""
     LB_BIN=""
     
-    # Check if in same directory
-    if [ -f "$SCRIPT_DIR/hysteria-zivpn" ]; then
+    # Priority 1: Check bin/ subdirectory (for installer)
+    if [ -f "$SCRIPT_DIR/bin/hysteria-zivpn" ]; then
+        HYSTERIA_BIN="$SCRIPT_DIR/bin/hysteria-zivpn"
+        LB_BIN="$SCRIPT_DIR/bin/loadbalancer"
+    # Priority 2: Check same directory
+    elif [ -f "$SCRIPT_DIR/hysteria-zivpn" ]; then
         HYSTERIA_BIN="$SCRIPT_DIR/hysteria-zivpn"
         LB_BIN="$SCRIPT_DIR/loadbalancer"
+    # Priority 3: Check arch-specific binaries
     elif [ -f "$SCRIPT_DIR/hysteria-zivpn-arm64" ]; then
         HYSTERIA_BIN="$SCRIPT_DIR/hysteria-zivpn-arm64"
         LB_BIN="$SCRIPT_DIR/loadbalancer-arm64"
+    elif [ -f "$SCRIPT_DIR/hysteria-zivpn-amd64" ]; then
+        HYSTERIA_BIN="$SCRIPT_DIR/hysteria-zivpn-amd64"
+        LB_BIN="$SCRIPT_DIR/loadbalancer-amd64"
+    # Priority 4: Check in PATH
     elif command -v hysteria-zivpn &> /dev/null; then
         HYSTERIA_BIN="hysteria-zivpn"
         LB_BIN="loadbalancer"
     else
         echo "❌ Error: Binary hysteria-zivpn tidak ditemukan!"
         echo "Pastikan file ini ada di folder yang sama dengan binary."
+        echo ""
+        echo "Lokasi yang dicek:"
+        echo "  - $SCRIPT_DIR/bin/"
+        echo "  - $SCRIPT_DIR/"
+        echo "  - System PATH"
         exit 1
     fi
     
