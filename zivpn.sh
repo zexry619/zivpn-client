@@ -156,7 +156,8 @@ EOFCONFIG
         echo "$PID" >> "$PID_FILE"
         TUNNEL_LIST="$TUNNEL_LIST,127.0.0.1:$PORT"
         
-        sleep 0.2
+        # BusyBox compatible sleep (OpenWrt)
+        sleep 1
     done
     
     TUNNEL_LIST="${TUNNEL_LIST:1}"
