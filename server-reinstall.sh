@@ -25,15 +25,26 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-echo -e "${BLUE}This will:${NC}"
-echo "  1. Uninstall existing ZIVPN server"
-echo "  2. Clean all configs and certificates"
-echo "  3. Install fresh ZIVPN server"
-echo ""
-read -p "Continue? [y/N]: " CONFIRM
-if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
-    echo "Cancelled."
-    exit 0
+# Check for auto-confirm when piped
+AUTO_CONFIRM=false
+if [ ! -t 0 ]; then
+    AUTO_CONFIRM=true
+fi
+
+if [ "$AUTO_CONFIRM" = false ]; then
+    echo -e "${BLUE}This will:${NC}"
+    echo "  1. Uninstall existing ZIVPN server"
+    echo "  2. Clean all configs and certificates"
+    echo "  3. Install fresh ZIVPN server"
+    echo ""
+    read -p "Continue? [y/N]: " CONFIRM
+    if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
+        echo "Cancelled."
+        exit 0
+    fi
+else
+    echo -e "${GREEN}Auto-confirm mode (piped input detected)${NC}"
+    echo "Starting full reinstall..."
 fi
 echo ""
 

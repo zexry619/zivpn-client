@@ -26,16 +26,28 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# Confirm uninstall
-echo -e "${YELLOW}⚠  This will remove:${NC}"
-echo "  - Binary: $BIN_PATH"
-echo "  - Config: $CONFIG_DIR/"
-echo "  - Service: /etc/systemd/system/zivpn-server.service"
-echo ""
-read -p "Continue? [y/N]: " CONFIRM
-if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
-    echo "Cancelled."
-    exit 0
+# Check for -y flag or auto-confirm when piped
+AUTO_CONFIRM=false
+if [ "$1" == "-y" ] || [ ! -t 0 ]; then
+    AUTO_CONFIRM=true
+fi
+
+if [ "$AUTO_CONFIRM" = false ]; then
+    # Interactive mode
+    echo -e "${YELLOW}⚠  This will remove:${NC}"
+    echo "  - Binary: $BIN_PATH"
+    echo "  - Config: $CONFIG_DIR/"
+    echo "  - Service: /etc/systemd/system/zivpn-server.service"
+    echo ""
+    read -p "Continue? [y/N]: " CONFIRM
+    if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
+        echo "Cancelled."
+        exit 0
+    fi
+else
+    # Auto-confirm when piped
+    echo -e "${GREEN}Auto-confirm mode (piped input detected)${NC}"
+    echo "Removing ZIVPN Server..."
 fi
 echo ""
 
@@ -97,20 +109,24 @@ else
 fi
 echo ""
 
-# Close firewall port (optional)
-echo "Firewall cleanup (optional)..."
-read -p "Close firewall port 36712/UDP? [y/N]: " CLOSE_FW
-if [[ "$CLOSE_FW" =~ ^[Yy]$ ]]; then
-    if command -v ufw &> /dev/null && ufw status | grep -q "Status: active"; then
-        ufw delete allow 36712/udp > /dev/null 2>&1 || true
-        echo -e "${GREEN}✓ UFW: Port 36712/UDP closed${NC}"
-    elif command -v firewall-cmd &> /dev/null && systemctl is-active --quiet firewalld; then
-        firewall-cmd --permanent --remove-port=36712/udp > /dev/null 2>&1 || true
-        firewall-cmd --reload > /dev/null 2>&1 || true
-        echo -e "${GREEN}✓ Firewalld: Port 36712/UDP closed${NC}"
-    else
-        echo -e "${YELLOW}⚠ No firewall detected${NC}"
+# Close firewall port (optional) - skip in auto mode
+if [ "$AUTO_CONFIRM" = false ]; then
+    echo "Firewall cleanup (optional)..."
+    read -p "Close firewall port 36712/UDP? [y/N]: " CLOSE_FW
+    if [[ "$CLOSE_FW" =~ ^[Yy]$ ]]; then
+        if command -v ufw &> /dev/null && ufw status | grep -q "Status: active"; then
+            ufw delete allow 36712/udp > /dev/null 2>&1 || true
+            echo -e "${GREEN}✓ UFW: Port 36712/UDP closed${NC}"
+        elif command -v firewall-cmd &> /dev/null && systemctl is-active --quiet firewalld; then
+            firewall-cmd --permanent --remove-port=36712/udp > /dev/null 2>&1 || true
+            firewall-cmd --reload > /dev/null 2>&1 || true
+            echo -e "${GREEN}✓ Firewalld: Port 36712/UDP closed${NC}"
+        else
+            echo -e "${YELLOW}⚠ No firewall detected${NC}"
+        fi
     fi
+else
+    echo "Skipping firewall cleanup (run manually if needed)..."
 fi
 echo ""
 
