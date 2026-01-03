@@ -119,35 +119,18 @@ start_zivpn() {
         PORT=$((START_PORT + i))
         CONFIG="$CONFIG_DIR/client-$PORT.json"
         
-        # Generate config
+        # Generate config (EXACT Android format)
         cat > "$CONFIG" <<EOFCONFIG
 {
   "server": "$SERVER",
+  "obfs": "$OBFS_KEY",
   "auth": "$PASSWORD",
-  "obfs": {
-    "type": "salamander",
-    "salamander": {
-      "password": "$OBFS_KEY"
-    }
-  },
-  "tls": {
-    "insecure": true
-  },
-  "quic": {
-    "initStreamReceiveWindow": 131072,
-    "maxStreamReceiveWindow": 131072,
-    "initConnReceiveWindow": 327680,
-    "maxConnReceiveWindow": 327680,
-    "maxIdleTimeout": "30s"
-  },
   "socks5": {
     "listen": "127.0.0.1:$PORT"
   },
-  "bandwidth": {
-    "up": "100 mbps",
-    "down": "100 mbps"
-  },
-  "speed_test": false
+  "insecure": true,
+  "recvwindowconn": 131072,
+  "recvwindow": 327680
 }
 EOFCONFIG
         
