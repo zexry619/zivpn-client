@@ -76,25 +76,26 @@ echo ""
 
 # Step 3: Interactive configuration
 echo "[3/4] Configuration..."
+echo ""
 
-if [ "$AUTO_CONFIRM" = false ]; then
-    echo ""
-    read -p "Enter server address (IP:PORT) [167.99.79.229:36712]: " SERVER_ADDR
-    SERVER_ADDR=${SERVER_ADDR:-167.99.79.229:36712}
-
-    read -p "Enter password [zivpn2025]: " PASSWORD
-    PASSWORD=${PASSWORD:-zivpn2025}
-
+# Always ask for config (even when piped) - use /dev/tty to read from terminal
+if [ -t 0 ]; then
+    # Normal input (not piped)
+    read -p "Enter server address (IP:PORT) [YOUR_SERVER:36712]: " SERVER_ADDR
+    read -p "Enter password [your-password]: " PASSWORD
     read -p "Enter obfuscation key [hu\`\`hqb\`c]: " OBFS_KEY
-    OBFS_KEY=${OBFS_KEY:-"hu\`\`hqb\`c"}
 else
-    # Auto mode - use defaults
-    SERVER_ADDR="YOUR_SERVER:36712"
-    PASSWORD="your-password"
-    OBFS_KEY="hu\`\`hqb\`c"
-    echo -e "${YELLOW}⚠ Using default config. Edit manually:${NC}"
-    echo "  nano $INSTALL_DIR/zivpn.sh"
+    # Piped input - read from terminal directly
+    echo "⚠ Piped input detected. Reading config from terminal..."
+    read -p "Enter server address (IP:PORT) [YOUR_SERVER:36712]: " SERVER_ADDR < /dev/tty
+    read -p "Enter password [your-password]: " PASSWORD < /dev/tty
+    read -p "Enter obfuscation key [hu\`\`hqb\`c]: " OBFS_KEY < /dev/tty
 fi
+
+# Set defaults if empty
+SERVER_ADDR=${SERVER_ADDR:-YOUR_SERVER:36712}
+PASSWORD=${PASSWORD:-your-password}
+OBFS_KEY=${OBFS_KEY:-"hu\`\`hqb\`c"}
 
 # Update zivpn.sh with config
 sed -i "s|^SERVER=.*|SERVER=\"$SERVER_ADDR\"|" "$INSTALL_DIR/zivpn.sh"
@@ -107,12 +108,8 @@ echo ""
 # Step 4: Add to PATH (optional)
 echo "[4/4] Setting up PATH..."
 
-if [ "$AUTO_CONFIRM" = false ]; then
-    read -p "Add to PATH for easy access? [Y/n]: " ADD_PATH
-    ADD_PATH=${ADD_PATH:-Y}
-else
-    ADD_PATH="Y"
-fi
+# Always add to PATH automatically
+ADD_PATH="Y"
 
 if [[ "$ADD_PATH" =~ ^[Yy]$ ]]; then
     # Detect shell
